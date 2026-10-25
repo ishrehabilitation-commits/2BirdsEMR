@@ -54,7 +54,12 @@ npm run db:seed:generate
    defaults (framework: Next.js).
 2. Deploy. With no environment variables it deploys in demo mode, which is
    perfect for showing people.
-3. To switch to Supabase later, add `NEXT_PUBLIC_SUPABASE_URL` and
+3. If you connected Supabase while creating the project (the Vercel Supabase
+   integration adds the keys for you), the app opens a **Finish setup** page
+   until you run the migration and seed. To keep showing the demo instead, add
+   `NEXT_PUBLIC_DEMO_MODE` = `true` under **Settings → Environment Variables**
+   and redeploy.
+4. To switch to Supabase later, add `NEXT_PUBLIC_SUPABASE_URL` and
    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` under **Settings → Environment
    Variables**, then redeploy.
 

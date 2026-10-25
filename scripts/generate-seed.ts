@@ -39,7 +39,11 @@ const out =
   insert("patients", d.patients) +
   insert("visits", d.visits) +
   insert("physician_orders", d.orders) +
-  insert("form_audits", d.audits);
+  insert("form_audits", d.audits) +
+  `-- Accounts created before this seed ran have no profile yet: add them to the demo agency.\n` +
+  `insert into public.staff_profiles (id, agency_id, full_name)\n` +
+  `select u.id, ${literal(DEMO_AGENCY.id)}, coalesce(u.raw_user_meta_data ->> 'full_name', split_part(u.email, '@', 1))\n` +
+  `from auth.users u\non conflict (id) do nothing;\n`;
 
 writeFileSync(new URL("../supabase/seed.sql", import.meta.url), out);
 console.log(`Wrote supabase/seed.sql (${d.patients.length} patients, ${d.visits.length} visits).`);

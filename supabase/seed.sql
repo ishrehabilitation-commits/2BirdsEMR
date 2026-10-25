@@ -243,3 +243,8 @@ insert into public.form_audits (agency_id, id, patient_id, visit_id, form_type, 
   ('a0000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000013', 'b0000000-0000-4000-8000-000000000013', 'e0000000-0000-4000-8000-000000000099', 'PTA Routine Visit', 'Supervisory visit overdue', 'medium', 'open', 'c0000000-0000-4000-8000-000000000002', ((now() at time zone 'America/Chicago')::date + 4)),
   ('a0000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000014', 'b0000000-0000-4000-8000-000000000014', 'e0000000-0000-4000-8000-000000000105', 'OASIS-E Recert', 'Fall risk score missing', 'high', 'open', 'c0000000-0000-4000-8000-000000000005', ((now() at time zone 'America/Chicago')::date + 5));
 
+-- Accounts created before this seed ran have no profile yet: add them to the demo agency.
+insert into public.staff_profiles (id, agency_id, full_name)
+select u.id, 'a0000000-0000-4000-8000-000000000001', coalesce(u.raw_user_meta_data ->> 'full_name', split_part(u.email, '@', 1))
+from auth.users u
+on conflict (id) do nothing;

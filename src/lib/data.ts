@@ -1,9 +1,13 @@
 import "server-only";
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { generateDataset, runtimeClock } from "./demo-data";
 import { createClient } from "./supabase/server";
 import { isSupabaseConfigured } from "./supabase/config";
 import type { Dataset } from "./types";
+
+// Postgres "undefined table", and PostgREST "table not in schema cache".
+const MISSING_TABLE_CODES = ["42P01", "PGRST205"];
 
 /**
  * Loads everything the UI needs for the signed-in user's agency.
@@ -30,6 +34,8 @@ export async function getDataset(): Promise<Dataset> {
   ]);
 
   const firstError = [clinicians, physicians, patients, visits, orders, audits].find((r) => r.error)?.error;
+  // Connected to Supabase, but the migration hasn't been run yet.
+  if (firstError && MISSING_TABLE_CODES.includes(firstError.code)) redirect("/setup");
   if (firstError) throw new Error(`Could not load data from Supabase: ${firstError.message}`);
 
   return {
